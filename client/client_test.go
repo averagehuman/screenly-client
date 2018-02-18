@@ -12,4 +12,10 @@ func TestDefaultClient(t *testing.T) {
 		fmt.Errorf("%s", err)
 	}
 
+	playlist := client.GetAssets()
+
+	if !playlist.IsEmpty() {
+		fmt.Errorf("Expected initial PlayList to be empty but it has %d items", len(playlist.Assets))
+	}
+
 }
