@@ -9,6 +9,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	//"io"
 	"net/http"
 	"net/url"
@@ -21,11 +22,11 @@ type ScreenlyClient struct {
 }
 
 // Return the current Screenly list of assets as a PlayList object
-func (sc *ScreenlyClient) GetAssets() *PlayList {
+func (sc *ScreenlyClient) List() *PlayList {
 	playlist := &PlayList{}
 	// The assets endpoint returns a JSON list not a JSON object, so the
 	// response body can't be decoded directly to a PlayList. So we have
-	// to unmarshal the asset list explicitly.
+	// to unmarshal to the PlayList.Assets field.
 	response, err := sc.get("assets")
 
 	if err == nil {
@@ -40,6 +41,19 @@ func (sc *ScreenlyClient) GetAssets() *PlayList {
 			if err == nil {
 				return playlist
 			}
+		}
+	}
+	panic(err)
+}
+
+func (sc *ScreenlyClient) Get(Id string) *Asset {
+	asset := &Asset{}
+	path := fmt.Sprintf("assets/%s", Id)
+	response, err := sc.get(path)
+	if err == nil {
+		err = json.NewDecoder(response.Body).Decode(asset)
+		if err == nil {
+			return asset
 		}
 	}
 	panic(err)

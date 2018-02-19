@@ -8,12 +8,12 @@ type Asset struct {
 	Uri          string    `json:"uri"`
 	Start        time.Time `json:"start_date"`
 	End          time.Time `json:"end_date"`
-	Duration     uint      `json:"duration"`
+	Duration     int64     `json:"duration"`
 	MimeType     string    `json:"mimetype"`
-	IsEnabled    bool      `json:"is_enabled,omitempty"`
-	IsProcessing bool      `json:"is_processing,omitempty"`
-	NoCache      bool      `json:"nocache,omitempty"`
-	PlayOrder    uint      `json:"play_order,omitempty"`
+	IsEnabled    int       `json:"is_enabled,omitempty"`
+	IsProcessing int       `json:"is_processing,omitempty"`
+	NoCache      int       `json:"nocache,omitempty"`
+	PlayOrder    int       `json:"play_order,omitempty"`
 }
 
 type PlayList struct {
@@ -22,4 +22,8 @@ type PlayList struct {
 
 func (p *PlayList) IsEmpty() bool {
 	return len(p.Assets) == 0
+}
+
+func (p *PlayList) Add(asset Asset) {
+	p.Assets = append(p.Assets, asset)
 }
