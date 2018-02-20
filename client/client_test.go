@@ -22,7 +22,6 @@ func TestDefaultClient(t *testing.T) {
 
 	// Add a webpage asset
 	asset, err := client.AddWebPage("BBC Home", "http://bbc.co.uk", 10, 60)
-	fmt.Println(asset.MimeType)
 
 	if err != nil {
 		t.Errorf("Failed to add webpage asset - %s", err)
@@ -38,6 +37,7 @@ func TestDefaultClient(t *testing.T) {
 		t.Errorf("Unexpected uri. Expected 'http://bbc.co.uk', got '%s'", asset.Uri)
 	}
 
+	// The asset list endpoint should return the one asset just added.
 	playlist = client.List()
 
 	if playlist.Size() != 1 {

@@ -23,8 +23,8 @@ type ScreenlyClient struct {
 }
 
 // Add an asset of type 'webpage' to the screenly playlist
-func (sc *ScreenlyClient) AddWebPage(name string, uri string, duration int64, expiry int64) (*AssetSummary, error) {
-	asset := new(Asset)
+func (sc *ScreenlyClient) AddWebPage(name string, uri string, duration int64, expiry int64) (*Asset, error) {
+	asset := new(AssetPayload)
 	asset.Name = name
 	asset.MimeType = "webpage"
 	asset.Uri = uri
@@ -63,8 +63,8 @@ func (sc *ScreenlyClient) List() *PlayList {
 }
 
 // Return the asset with the given id
-func (sc *ScreenlyClient) Get(id string) *AssetSummary {
-	asset := &AssetSummary{}
+func (sc *ScreenlyClient) Get(id string) *Asset {
+	asset := &Asset{}
 	path := fmt.Sprintf("assets/%s", id)
 	response, err := sc.doHttp("GET", path, nil)
 	if err == nil {
@@ -77,14 +77,14 @@ func (sc *ScreenlyClient) Get(id string) *AssetSummary {
 }
 
 // Add an asset to the playlist
-func (sc *ScreenlyClient) Post(asset *Asset) (*AssetSummary, error) {
+func (sc *ScreenlyClient) Post(payload *AssetPayload) (*Asset, error) {
 	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(asset)
+	err := json.NewEncoder(b).Encode(payload)
 	if err == nil {
 		path := "assets"
 		response, err := sc.doHttp("POST", path, b)
 		if err == nil {
-			received := &AssetSummary{}
+			received := &Asset{}
 			//io.Copy(os.Stdout, response.Body)
 			err = json.NewDecoder(response.Body).Decode(received)
 			if err == nil {
@@ -96,14 +96,14 @@ func (sc *ScreenlyClient) Post(asset *Asset) (*AssetSummary, error) {
 }
 
 // Update an existing asset
-func (sc *ScreenlyClient) Put(id string, asset *Asset) (*AssetSummary, error) {
+func (sc *ScreenlyClient) Put(id string, payload *AssetPayload) (*Asset, error) {
 	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(asset)
+	err := json.NewEncoder(b).Encode(payload)
 	if err == nil {
 		path := fmt.Sprintf("assets/%s", id)
 		response, err := sc.doHttp("PUT", path, b)
 		if err == nil {
-			received := &AssetSummary{}
+			received := &Asset{}
 			//io.Copy(os.Stdout, response.Body)
 			err = json.NewDecoder(response.Body).Decode(received)
 			if err == nil {
