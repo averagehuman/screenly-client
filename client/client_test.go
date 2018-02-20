@@ -38,7 +38,7 @@ func TestDefaultClient(t *testing.T) {
 
 	playlist = client.List()
 
-	if playlist.Size() != 2 {
+	if playlist.Size() != 1 {
 		t.Errorf("Expected PlayList to return one item but it returned %d", playlist.Size())
 	}
 }

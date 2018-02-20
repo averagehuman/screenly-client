@@ -23,7 +23,7 @@ type ScreenlyClient struct {
 }
 
 // Add an asset of type 'webpage' to the screenly playlist
-func (sc *ScreenlyClient) AddWebPage(name string, uri string, duration int64, expiry int64) (*Asset, error) {
+func (sc *ScreenlyClient) AddWebPage(name string, uri string, duration int64, expiry int64) (*AssetSummary, error) {
 	asset := new(Asset)
 	asset.Name = name
 	asset.MimeType = "webpage"
@@ -33,8 +33,7 @@ func (sc *ScreenlyClient) AddWebPage(name string, uri string, duration int64, ex
 	asset.End = asset.Start.Add(time.Second * time.Duration(expiry))
 	asset.IsEnabled = "1"
 	asset.IsActive = true
-	id := Sha1(uri)
-	return sc.Put(id, asset)
+	return sc.Post(asset)
 }
 
 // Return the current Screenly list of assets as a PlayList object
@@ -46,6 +45,7 @@ func (sc *ScreenlyClient) List() *PlayList {
 	response, err := sc.doHttp("GET", "assets", nil)
 
 	if err == nil {
+		//io.Copy(os.Stdout, response.Body)
 		// Create a buffer and read response body, eg. [{...}, {...}]
 		b := new(bytes.Buffer)
 		// (the first ignored parameter is the number of bytes read)
@@ -63,8 +63,8 @@ func (sc *ScreenlyClient) List() *PlayList {
 }
 
 // Return the asset with the given id
-func (sc *ScreenlyClient) Get(id string) *Asset {
-	asset := &Asset{}
+func (sc *ScreenlyClient) Get(id string) *AssetSummary {
+	asset := &AssetSummary{}
 	path := fmt.Sprintf("assets/%s", id)
 	response, err := sc.doHttp("GET", path, nil)
 	if err == nil {
@@ -77,14 +77,33 @@ func (sc *ScreenlyClient) Get(id string) *Asset {
 }
 
 // Add an asset to the playlist
-func (sc *ScreenlyClient) Put(id string, asset *Asset) (*Asset, error) {
+func (sc *ScreenlyClient) Post(asset *Asset) (*AssetSummary, error) {
+	b := new(bytes.Buffer)
+	err := json.NewEncoder(b).Encode(asset)
+	if err == nil {
+		path := "assets"
+		response, err := sc.doHttp("POST", path, b)
+		if err == nil {
+			received := &AssetSummary{}
+			//io.Copy(os.Stdout, response.Body)
+			err = json.NewDecoder(response.Body).Decode(received)
+			if err == nil {
+				return received, nil
+			}
+		}
+	}
+	return nil, err
+}
+
+// Update an existing asset
+func (sc *ScreenlyClient) Put(id string, asset *Asset) (*AssetSummary, error) {
 	b := new(bytes.Buffer)
 	err := json.NewEncoder(b).Encode(asset)
 	if err == nil {
 		path := fmt.Sprintf("assets/%s", id)
 		response, err := sc.doHttp("PUT", path, b)
 		if err == nil {
-			received := &Asset{}
+			received := &AssetSummary{}
 			//io.Copy(os.Stdout, response.Body)
 			err = json.NewDecoder(response.Body).Decode(received)
 			if err == nil {
