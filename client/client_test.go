@@ -15,7 +15,9 @@ func TestDefaultClient(t *testing.T) {
 	playlist := client.List()
 
 	if !playlist.IsEmpty() {
-		t.Errorf("Expected initial PlayList to be empty but it has %d items", len(playlist.Assets))
+		t.Fatalf(
+			"The initial PlayList is not empty (has %d items). "+
+				"Make sure to restart the screenly docker container between each test run.", len(playlist.Assets))
 	}
 
 	// Add a webpage asset
@@ -39,6 +41,6 @@ func TestDefaultClient(t *testing.T) {
 	playlist = client.List()
 
 	if playlist.Size() != 1 {
-		t.Errorf("Expected PlayList to return one item but it returned %d", playlist.Size())
+		t.Errorf("Expected PlayList to return one item but it returned %d.", playlist.Size())
 	}
 }
