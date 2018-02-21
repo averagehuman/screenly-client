@@ -22,6 +22,26 @@ type ScreenlyClient struct {
 	BaseUrl    *url.URL
 }
 
+// Utility factory function for creating a ScreenlyClient from a Config object
+func New(config Config) (*ScreenlyClient, error) {
+	url, err := url.Parse(config.ENDPOINT)
+	if err != nil {
+		return nil, err
+	}
+	timeout := time.Duration(config.TIMEOUT) * time.Second
+	httpClient := &http.Client{Timeout: timeout}
+	return &ScreenlyClient{httpClient: httpClient, BaseUrl: url}, nil
+}
+
+// Utility factory function for creating a ScreenlyClient with default configuration
+func DefaultClient() (*ScreenlyClient, error) {
+	client, err := New(defaultConfig)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
 // Add an asset of type 'webpage' to the screenly playlist
 func (sc *ScreenlyClient) AddWebPage(name string, uri string, duration int64, expiry int64) (*Asset, error) {
 	asset := new(AssetPayload)
