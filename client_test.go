@@ -3,6 +3,7 @@ package client
 import "fmt"
 import "testing"
 
+// Basic happy path test - list assets, create and delete an asset.
 func TestDefaultClient(t *testing.T) {
 	client, err := DefaultClient()
 	if err != nil {
@@ -15,6 +16,7 @@ func TestDefaultClient(t *testing.T) {
 		fmt.Errorf("Unexpected default port. Expected 8080, got %s", client.BaseUrl.Host)
 	}
 
+	// List all active assets - should be empty initially.
 	playlist := client.List()
 
 	if !playlist.IsEmpty() {
@@ -40,13 +42,13 @@ func TestDefaultClient(t *testing.T) {
 		t.Errorf("Unexpected uri. Expected 'http://bbc.co.uk', got '%s'", asset.Uri)
 	}
 
-	// The asset list endpoint should return the one asset just added.
+	// ...the asset list endpoint should now return the asset just added.
 	playlist = client.List()
 	if playlist.Size() != 1 {
 		t.Errorf("Expected PlayList to return one item but it returned %d.", playlist.Size())
 	}
 
-	// The item returned in the list should be identical to the asset as saved.
+	// ...the item returned in the list should be identical to the asset as saved.
 	item := playlist.Assets[0]
 
 	if item.Id != asset.Id {
@@ -65,7 +67,7 @@ func TestDefaultClient(t *testing.T) {
 		t.Errorf("The delete method returned an error: %s", err)
 	}
 
-	// The playlist should now be empty.
+	// ...the playlist should now be empty.
 	playlist = client.List()
 	if playlist.Size() != 0 {
 		t.Errorf("Expected PlayList to be empty but it has size %d.", playlist.Size())
